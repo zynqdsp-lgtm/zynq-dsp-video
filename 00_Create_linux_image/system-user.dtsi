@@ -1,0 +1,6 @@
+/ {
+chosen {
+    	bootargs = "clk_ignore_unused";
+    }; 
+  
+};

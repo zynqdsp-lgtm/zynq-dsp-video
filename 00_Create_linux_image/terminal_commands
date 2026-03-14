@@ -1,0 +1,110 @@
+sudo apt install build-essential chrpath cpio debianutils diffstat file gawk gcc git iputils-ping libacl1 liblz4-tool locales python3 python3-git python3-jinja2 python3-pexpect python3-pip python3-subunit socat texinfo unzip wget xz-utils zstd curl mtools
+
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+
+sudo dpkg-reconfigure dash
+
+
+
+curl https://storage.googleapis.com/git-repo-downloads/repo > repo
+chmod a+x repo
+mv repo ~/bin/
+PATH=~/bin:$PATH
+repo --help
+
+repo init -u https://github.com/Xilinx/yocto-manifests.git -b refs/tags/amd-edf-rel-v25.11 -m default-edf.xml  
+
+repo sync
+
+
+
+source edf-init-build-env
+
+tar -xf downloads_edf_25.11_11151020.tar.gz -C ~/Documents/project/yocto/edf/build
+tar -xf sstate-cache_edf_25.11_11151020.tar.gz -C ~/Documents/project/yocto/edf/build
+
+
+
+
+SOURCE_MIRROR_URL = "file:///~/Documents/project/yocto/edf/build/downloads"
+
+SSTATE_MIRRORS = "\
+file://.* file:///~/Documents/project/yocto/edf/build/sstate-cache/PATH \n \"
+
+BB_NO_NETWORK = "1"
+PREMIRRORS:append = ""
+
+
+source /home/livec/tools/Xilinx/2025.2/Vitis/settings64.sh
+
+sdtgen
+
+set_dt_param -dir ./sdt
+
+set_dt_param -xsa ~/Documents/project/vivado/design_1_wrapper.xsa
+
+generate_sdt
+
+
+
+source edf-init-build-env
+
+bitbake-layers create-layer ../sources/meta-custom-zynq-bsp
+
+bitbake-layers add-layer ../sources/meta-custom-zynq-bsp
+
+gen-machine-conf parse-sdt --hw-description ~/Documents/project/sdt \
+    -c ../sources/meta-custom-zynq-bsp/conf --machine-name  zynq-machine
+    
+    
+    
+    
+source edf-init-build-env
+
+bitbake-layers create-layer ../sources/meta-zynq-device-tree
+
+bitbake-layers add-layer ../sources/meta-zynq-device-tree
+
+recipes-bsp device-tree device-tree.bbappend files 
+
+
+
+source edf-init-build-env
+
+MACHINE=zynq-machine bitbake -c menuconfig linux-xlnx
+
+
+
+
+source edf-init-build-env
+
+MACHINE=zynq-machine  bitbake xilinx-bootbin
+
+MACHINE=zynq-machine  bitbake edf-linux-disk-image
+
+
+source edf-init-build-env
+
+wic ls tmp/deploy/images/zynq-machine/edf-linux-disk-image-zynq-machine.rootfs.wic
+
+wic ls tmp/deploy/images/zynq-machine/edf-linux-disk-image-zynq-machine.rootfs.wic:1
+
+wic cp \
+    tmp/deploy/images/zynq-machine//boot.bin \
+    tmp/deploy/images/zynq-machine/edf-linux-disk-image-zynq-machine.rootfs.wic:1
+    
+wic ls tmp/deploy/images/zynq-machine/edf-linux-disk-image-zynq-machine.rootfs.wic:1
+
+
+
+COMPATIBLE_MACHINE:zynq-machine = "${MACHINE}"
+
+source edf-init-build-env
+
+MACHINE=zynq-machine bitbake meta-edf-app-sdk
+
+   
+scp linux_hello_world.elf amd-edf@192.168.0.101:/home/amd-edf
+
+
