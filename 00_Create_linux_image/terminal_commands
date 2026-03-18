@@ -91,7 +91,7 @@ wic ls tmp/deploy/images/zynq-machine/edf-linux-disk-image-zynq-machine.rootfs.w
 wic ls tmp/deploy/images/zynq-machine/edf-linux-disk-image-zynq-machine.rootfs.wic:1
 
 wic cp \
-    tmp/deploy/images/zynq-machine//boot.bin \
+    tmp/deploy/images/zynq-machine/boot.bin \
     tmp/deploy/images/zynq-machine/edf-linux-disk-image-zynq-machine.rootfs.wic:1
     
 wic ls tmp/deploy/images/zynq-machine/edf-linux-disk-image-zynq-machine.rootfs.wic:1
